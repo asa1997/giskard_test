@@ -1,4 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import giskard
 
 model_name = "microsoft/Phi-3-mini-4k-instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
