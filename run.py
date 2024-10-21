@@ -5,7 +5,7 @@ import os
 
 from giskard.llm.client.mistral import MistralClient
 
-os.environ['MISTRAL_API_KEY'] = "NwlN1rWLUK7N22inPzH5ARZYKxSRxDeX9NJxZSOy"
+os.environ['MISTRAL_API_KEY'] = "e33RIAPiVKoYUAUjldIxmTYHIqzkYZr4H/fvYvhc"
 
 mc = MistralClient()
 
