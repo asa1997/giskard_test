@@ -66,7 +66,7 @@ class BaseBedrockClient(LLMClient, ABC):
 class MistralBedrockClient(BaseBedrockClient):
     def __init__(
         self,
-        bedrock_runtime_client,
+        bedrock_runtime_client = boto3.client("bedrock-runtime", region_name=os.environ["AWS_DEFAULT_REGION"]),
         model: str = "mistral.mistral-7b-instruct-v0:2",
         anthropic_version: str = "bedrock-2023-05-31",
     ):
