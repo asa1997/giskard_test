@@ -9,6 +9,7 @@ from giskard.llm.config import LLMConfigurationError
 from giskard.llm.errors import LLMImportError
 from giskard.llm.client.base import LLMClient, ChatMessage
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification
+import pandas as pd
 
 # from .base import ChatMessage
 
@@ -150,6 +151,11 @@ giskard_model = giskard.Model(
     classification_labels=["negative", "positive"],
     batch_size=32,  # set the batch size here to speed up inference on GPU
 )
+
+gsk_dataset = gsk.Dataset(
+    pd.DataFrame({"text": ["I hate this movie", "I love this movie"]})
+)
+gsk_model.predict(gsk_dataset)
 
 scan_results = giskard.scan(giskard_model)
 
