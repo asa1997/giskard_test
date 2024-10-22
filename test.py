@@ -8,7 +8,7 @@ from giskard.llm.client import set_default_client
 from giskard.llm.config import LLMConfigurationError
 from giskard.llm.errors import LLMImportError
 from giskard.llm.client.base import LLMClient, ChatMessage
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification
 
 # from .base import ChatMessage
 
@@ -132,16 +132,23 @@ class MistralBedrockClient(BaseBedrockClient):
 
 set_default_client(MistralBedrockClient())
 
-model_name = "microsoft/Phi-3-mini-4k-instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-
+# model_name = "microsoft/Phi-3-mini-4k-instruct"
+model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
 giskard_model = giskard.Model(
     model=model,
-    model_type="text_generation",
-    name="Climate Change Question Answering",
-    description="This model answers any question about climate change based on IPCC reports",
-    feature_names=["Hello, what can you do?"],
+    model_type="classification",
+    name="DistilBERT SST-2",
+    data_preprocessing_function=lambda df: tokenizer(
+        df["text"].tolist(),
+        padding=True,
+        truncation=True,
+        max_length=512,
+        return_tensors="pt",
+    ),
+    feature_names=["text"],
+    classification_labels=["negative", "positive"],
+    batch_size=32,  # set the batch size here to speed up inference on GPU
 )
 
 scan_results = giskard.scan(giskard_model)
