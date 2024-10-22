@@ -8,6 +8,7 @@ from giskard.llm.client import set_default_client
 from giskard.llm.config import LLMConfigurationError
 from giskard.llm.errors import LLMImportError
 from giskard.llm.client.base import LLMClient, ChatMessage
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # from .base import ChatMessage
 
