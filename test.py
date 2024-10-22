@@ -152,10 +152,10 @@ giskard_model = giskard.Model(
     batch_size=32,  # set the batch size here to speed up inference on GPU
 )
 
-gsk_dataset = gsk.Dataset(
+gsk_dataset = giskard.Dataset(
     pd.DataFrame({"text": ["I hate this movie", "I love this movie"]})
 )
-gsk_model.predict(gsk_dataset)
+giskard_model.predict(gsk_dataset)
 
 scan_results = giskard.scan(giskard_model)
 
