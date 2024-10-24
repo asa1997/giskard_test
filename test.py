@@ -157,6 +157,6 @@ gsk_dataset = giskard.Dataset(
 )
 giskard_model.predict(gsk_dataset)
 
-# scan_results = giskard.scan(giskard_model)
+scan_results = giskard.scan(giskard_model)
 
-# display(scan_results)
+print(scan_results)
