@@ -3,13 +3,15 @@ from typing import Dict, List, Optional, Sequence
 import os
 import json
 from abc import ABC, abstractmethod
-
+import datasets
 from giskard.llm.client import set_default_client
 from giskard.llm.config import LLMConfigurationError
 from giskard.llm.errors import LLMImportError
 from giskard.llm.client.base import LLMClient, ChatMessage
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification
 import pandas as pd
+import huggingface_hub
+
 
 # from .base import ChatMessage
 
@@ -133,6 +135,99 @@ class MistralBedrockClient(BaseBedrockClient):
 
 set_default_client(MistralBedrockClient())
 
+def _select_best_dataset_split(split_names):
+        """Get the best split for testing.
+
+        Selects the split `test` if available, otherwise `validation`, and as a last resort `train`.
+        If there is only one split, we return that split.
+        """
+        # If only one split is available, we just use that one.
+        if len(split_names) == 1:
+            return split_names[0]
+
+        # Otherwise iterate based on the preferred prefixes.
+        for prefix in ["test", "valid", "train"]:
+            try:
+                return next(x for x in split_names if x.startswith(prefix))
+            except StopIteration:
+                pass
+
+        return None
+
+def load_dataset(
+        dataset_id, dataset_config=None, dataset_split=None, model_id=None
+    ):
+        """Load a dataset from the HuggingFace Hub."""
+        logger.debug(
+            f"Trying to load dataset `{dataset_id}` (config = `{dataset_config}`, split = `{dataset_split}`)."
+        )
+        try:
+            # we do not set the split here
+            # because we want to be able to select the best split later with preprocessing
+            hf_dataset = datasets.load_dataset(dataset_id, name=dataset_config)
+
+            if isinstance(hf_dataset, datasets.Dataset):
+                logger.debug(f"Loaded dataset with {hf_dataset.size_in_bytes} bytes")
+            else:
+                logger.debug("Loaded dataset is a DatasetDict")
+
+            if dataset_split is None:
+                dataset_split = self._select_best_dataset_split(list(hf_dataset.keys()))
+                logger.info(
+                    f"No split provided, automatically selected split = `{dataset_split}`)."
+                )
+                hf_dataset = hf_dataset[dataset_split]
+
+            return hf_dataset
+        except ValueError as err:
+            msg = (
+                f"Could not load dataset `{dataset_id}` with config `{dataset_config}`."
+            )
+            raise DatasetError(msg) from err
+
+def _flatten_hf_dataset(hf_dataset, data_split=None):
+        """
+        Flatten the dataset to a pandas dataframe
+        """
+        flat_dataset = pd.DataFrame()
+        if isinstance(hf_dataset, datasets.DatasetDict):
+            keys = list(hf_dataset.keys())
+            for k in keys:
+                if data_split is not None and k == data_split:
+                    # Match the data split
+                    flat_dataset = hf_dataset[k]
+                    break
+
+                # Otherwise infer one data split
+                if k.startswith("train"):
+                    continue
+                elif k.startswith(data_split):
+                    # TODO: only support one split for now
+                    # Maybe we can merge all the datasets into one
+                    flat_dataset = hf_dataset[k]
+                    break
+                else:
+                    flat_dataset = hf_dataset[k]
+
+            # If there are only train datasets
+            if isinstance(flat_dataset, pd.DataFrame) and flat_dataset.empty:
+                flat_dataset = hf_dataset[keys[0]]
+
+        return flat_dataset
+
+def _find_dataset_id_from_model(model_id):
+    """Find the dataset ID from the model metadata."""
+    model_card = huggingface_hub.model_info(model_id).cardData
+
+    if "datasets" not in model_card:
+        msg = f"Could not find dataset for model `{model_id}`."
+        raise DatasetError(msg)
+
+    # Take the first one
+    dataset_id = model_card["datasets"][0]
+    return dataset_id
+
+
 # model_name = "microsoft/Phi-3-mini-4k-instruct"
 model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
@@ -152,10 +247,12 @@ giskard_model = giskard.Model(
     batch_size=32,  # set the batch size here to speed up inference on GPU
 )
 
-gsk_dataset = giskard.Dataset(
-    pd.DataFrame({"text": ["I hate this movie", "I love this movie"]})
-)
-# giskard_model.predict(gsk_dataset)
+dataset_id = _find_dataset_id_from_model('distilbert-base-uncased-finetuned-sst-2-english')
+
+hf_dataset = load_dataset(dataset_id)
+
+gsk_dataset = _flatten_hf_dataset(hf_dataset, '')
+
 
 scan_results = giskard.scan(giskard_model, gsk_dataset)
 
