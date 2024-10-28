@@ -174,7 +174,7 @@ def load_dataset(
                 logger.debug("Loaded dataset is a DatasetDict")
 
             if dataset_split is None:
-                dataset_split = self._select_best_dataset_split(list(hf_dataset.keys()))
+                dataset_split = _select_best_dataset_split(list(hf_dataset.keys()))
                 logger.info(
                     f"No split provided, automatically selected split = `{dataset_split}`)."
                 )
