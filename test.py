@@ -251,6 +251,8 @@ giskard_model = giskard.Model(
 
 dataset_id = _find_dataset_id_from_model('distilbert-base-uncased-finetuned-sst-2-english')
 
+print("dataset id: ", dataset_id)
+
 hf_dataset = load_dataset(dataset_id)
 
 gsk_dataset_flatten = _flatten_hf_dataset(hf_dataset, '')
