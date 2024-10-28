@@ -22,6 +22,8 @@ except ImportError as err:
         flavor="llm", msg="To use Bedrock models, please install the `boto3` package with `pip install boto3`"
     ) from err
 
+logger = logging.getLogger(__name__)
+
 
 class BaseBedrockClient(LLMClient, ABC):
     def __init__(self, bedrock_runtime_client, model: str):
