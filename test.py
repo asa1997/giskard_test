@@ -13,6 +13,7 @@ import pandas as pd
 import huggingface_hub
 import logging
 
+from hg_loader import HuggingFaceLoader
 # from .base import ChatMessage
 
 try:
@@ -137,127 +138,30 @@ class MistralBedrockClient(BaseBedrockClient):
 
 set_default_client(MistralBedrockClient())
 
-def _select_best_dataset_split(split_names):
-        """Get the best split for testing.
+if __name__ == "__main__":
 
-        Selects the split `test` if available, otherwise `validation`, and as a last resort `train`.
-        If there is only one split, we return that split.
-        """
-        # If only one split is available, we just use that one.
-        if len(split_names) == 1:
-            return split_names[0]
+    # model_name = "microsoft/Phi-3-mini-4k-instruct"
+    # model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+    # tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+    # giskard_model = giskard.Model(
+    #     model=model,
+    #     model_type="classification",
+    #     name="DistilBERT SST-2",
+    #     data_preprocessing_function=lambda df: tokenizer(
+    #         df["text"].tolist(),
+    #         padding=True,
+    #         truncation=True,
+    #         max_length=512,
+    #         return_tensors="pt",
+    #     ),
+    #     feature_names=["text"],
+    #     classification_labels=["negative", "positive"],
+    #     batch_size=32,  # set the batch size here to speed up inference on GPU
+    # )
 
-        # Otherwise iterate based on the preferred prefixes.
-        for prefix in ["test", "valid", "train"]:
-            try:
-                return next(x for x in split_names if x.startswith(prefix))
-            except StopIteration:
-                pass
+    model, dataset = HuggingFaceLoader.load_giskard_model_dataset("distilbert-base-uncased-finetuned-sst-2-english")
 
-        return None
+    scan_results = giskard.scan(giskard_model, gsk_dataset)
 
-def load_dataset(
-        dataset_id, dataset_config=None, dataset_split=None, model_id=None
-    ):
-        """Load a dataset from the HuggingFace Hub."""
-        logger.debug(
-            f"Trying to load dataset `{dataset_id}` (config = `{dataset_config}`, split = `{dataset_split}`)."
-        )
-        try:
-            # we do not set the split here
-            # because we want to be able to select the best split later with preprocessing
-            hf_dataset = datasets.load_dataset(dataset_id, name=dataset_config)
+    print(scan_results)
 
-            if isinstance(hf_dataset, datasets.Dataset):
-                logger.debug(f"Loaded dataset with {hf_dataset.size_in_bytes} bytes")
-            else:
-                logger.debug("Loaded dataset is a DatasetDict")
-
-            if dataset_split is None:
-                dataset_split = _select_best_dataset_split(list(hf_dataset.keys()))
-                logger.info(
-                    f"No split provided, automatically selected split = `{dataset_split}`)."
-                )
-                hf_dataset = hf_dataset[dataset_split]
-
-            return hf_dataset
-        except ValueError as err:
-            msg = (
-                f"Could not load dataset `{dataset_id}` with config `{dataset_config}`."
-            )
-            raise DatasetError(msg) from err
-
-def _flatten_hf_dataset(hf_dataset, data_split=None):
-        """
-        Flatten the dataset to a pandas dataframe
-        """
-        flat_dataset = pd.DataFrame()
-        if isinstance(hf_dataset, datasets.DatasetDict):
-            keys = list(hf_dataset.keys())
-            for k in keys:
-                if data_split is not None and k == data_split:
-                    # Match the data split
-                    flat_dataset = hf_dataset[k]
-                    break
-
-                # Otherwise infer one data split
-                if k.startswith("train"):
-                    continue
-                elif k.startswith(data_split):
-                    # TODO: only support one split for now
-                    # Maybe we can merge all the datasets into one
-                    flat_dataset = hf_dataset[k]
-                    break
-                else:
-                    flat_dataset = hf_dataset[k]
-
-            # If there are only train datasets
-            if isinstance(flat_dataset, pd.DataFrame) and flat_dataset.empty:
-                flat_dataset = hf_dataset[keys[0]]
-
-        return flat_dataset
-
-def _find_dataset_id_from_model(model_id):
-    """Find the dataset ID from the model metadata."""
-    model_card = huggingface_hub.model_info(model_id).cardData
-
-    if "datasets" not in model_card:
-        msg = f"Could not find dataset for model `{model_id}`."
-        raise DatasetError(msg)
-
-    # Take the first one
-    dataset_id = model_card["datasets"][0]
-    return dataset_id
-
-
-# model_name = "microsoft/Phi-3-mini-4k-instruct"
-model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
-tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
-giskard_model = giskard.Model(
-    model=model,
-    model_type="classification",
-    name="DistilBERT SST-2",
-    data_preprocessing_function=lambda df: tokenizer(
-        df["text"].tolist(),
-        padding=True,
-        truncation=True,
-        max_length=512,
-        return_tensors="pt",
-    ),
-    feature_names=["text"],
-    classification_labels=["negative", "positive"],
-    batch_size=32,  # set the batch size here to speed up inference on GPU
-)
-
-dataset_id = _find_dataset_id_from_model('distilbert-base-uncased-finetuned-sst-2-english')
-
-print("dataset id: ", dataset_id)
-
-hf_dataset = load_dataset(dataset_id)
-
-gsk_dataset_flatten = _flatten_hf_dataset(hf_dataset, '')
-gsk_dataset = giskard.Dataset(gsk_dataset_flatten)
-
-scan_results = giskard.scan(giskard_model, gsk_dataset)
-
-print(scan_results)
