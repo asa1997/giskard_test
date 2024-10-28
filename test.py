@@ -11,7 +11,7 @@ from giskard.llm.client.base import LLMClient, ChatMessage
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification
 import pandas as pd
 import huggingface_hub
-
+import logging
 
 # from .base import ChatMessage
 
