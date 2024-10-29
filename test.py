@@ -161,7 +161,7 @@ if __name__ == "__main__":
     # )
 
     giskard_model, giskard_dataset = loader.load_giskard_model_dataset(
-    model="distilbert-base-uncased-finetuned-sst-2-english",
+    model="cardiffnlp/twitter-roberta-base-sentiment-latest",
     dataset=None,
     dataset_config=None,              # Specify dataset config if needed
     dataset_split="train",             # Specify dataset split (e.g., 'test', 'train')
