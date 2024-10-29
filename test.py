@@ -163,7 +163,7 @@ if __name__ == "__main__":
     giskard_model, giskard_dataset = loader.load_giskard_model_dataset(
     model="cardiffnlp/twitter-roberta-base-sentiment-latest",
     dataset=None,
-    dataset_config=None,              # Specify dataset config if needed
+    dataset_config="sentiment",              # Specify dataset config if needed
     dataset_split="train",             # Specify dataset split (e.g., 'test', 'train')
     manual_feature_mapping=None,      # Optional: Custom feature mapping
     classification_label_mapping=None # Optional: Custom label mapping
