@@ -17,7 +17,7 @@ from transformers.pipelines import TextClassificationPipeline
 import numpy as np
 
 from .base_loader import DatasetError
-from .huggingface_inf_model import classification_model_from_inference_api
+# from .huggingface_inf_model import classification_model_from_inference_api
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class HuggingFaceLoader:
 
         if "datasets" not in model_card:
             msg = f"Could not find dataset for model `{model_id}`."
-            raise DatasetError(msg)
+            raise RuntimeError(f"Could not find dataset for model `{model_id}`.")
 
         # Take the first one
         dataset_id = model_card["datasets"][0]
@@ -196,7 +196,7 @@ class HuggingFaceLoader:
             msg = (
                 f"Could not load dataset `{dataset_id}` with config `{dataset_config}`."
             )
-            raise DatasetError(msg) from err
+            raise RuntimeError(f"Could not find dataset for model `{model_id}`.") from err
 
     def load_model(self, model_id):
         from transformers import pipeline
