@@ -164,7 +164,7 @@ if __name__ == "__main__":
     model="distilbert-base-uncased-finetuned-sst-2-english",
     dataset=None,
     dataset_config=None,              # Specify dataset config if needed
-    dataset_split="test",             # Specify dataset split (e.g., 'test', 'train')
+    dataset_split="train",             # Specify dataset split (e.g., 'test', 'train')
     manual_feature_mapping=None,      # Optional: Custom feature mapping
     classification_label_mapping=None # Optional: Custom label mapping
 )
