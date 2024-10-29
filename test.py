@@ -24,6 +24,7 @@ except ImportError as err:
     ) from err
 
 logger = logging.getLogger(__name__)
+loader = HuggingFaceLoader()
 
 
 class BaseBedrockClient(LLMClient, ABC):
@@ -159,9 +160,16 @@ if __name__ == "__main__":
     #     batch_size=32,  # set the batch size here to speed up inference on GPU
     # )
 
-    model, dataset = HuggingFaceLoader.load_giskard_model_dataset("distilbert-base-uncased-finetuned-sst-2-english")
+    giskard_model, giskard_dataset = loader.load_giskard_model_dataset(
+    model="distilbert-base-uncased-finetuned-sst-2-english",
+    dataset=None,
+    dataset_config=None,              # Specify dataset config if needed
+    dataset_split="test",             # Specify dataset split (e.g., 'test', 'train')
+    manual_feature_mapping=None,      # Optional: Custom feature mapping
+    classification_label_mapping=None # Optional: Custom label mapping
+)
 
-    scan_results = giskard.scan(giskard_model, gsk_dataset)
+    scan_results = giskard.scan(giskard_model, giskard_dataset)
 
     print(scan_results)
 
