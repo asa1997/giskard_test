@@ -51,7 +51,6 @@ class HuggingFaceLoader:
         # Take the first one
         dataset_id = model_card["datasets"][0]
         return dataset_id
-    @staticmethod
     def load_giskard_model_dataset(
         self,
         model=None,
