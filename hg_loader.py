@@ -211,7 +211,7 @@ class HuggingFaceLoader(BaseLoader):
         hf_model,
         labels,
         features=None,
-        inference_type="hf_inference_api",
+        inference_type="hf_pipeline",
         device=None,
         hf_token=None,
         inference_api_batch_size=200,
