@@ -169,6 +169,6 @@ if __name__ == "__main__":
     classification_label_mapping=None # Optional: Custom label mapping
 )
 
-    scan_results = giskard.scan(giskard_model, giskard_dataset, only=["performance_bias"])
+    scan_results = giskard.scan(giskard_model, giskard_dataset, only=["ethical_bias"])
 
     scan_results.to_json("model_scan_results.json")
