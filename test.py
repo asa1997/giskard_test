@@ -171,5 +171,4 @@ if __name__ == "__main__":
 
     scan_results = giskard.scan(giskard_model, giskard_dataset)
 
-    print(scan_results)
-
+    scan_results.to_html("model_scan_results.html")
