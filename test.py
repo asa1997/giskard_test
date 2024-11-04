@@ -169,6 +169,6 @@ if __name__ == "__main__":
     classification_label_mapping=None # Optional: Custom label mapping
 )
 
-    scan_results = giskard.scan(giskard_model, giskard_dataset)
+    scan_results = giskard.scan(giskard_model, giskard_dataset, only=["performance"])
 
     scan_results.to_html("model_scan_results.html")
