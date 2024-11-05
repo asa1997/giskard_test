@@ -295,7 +295,7 @@ class HuggingFaceLoader:
 
     def _get_feature_mapping(self, hf_model, hf_dataset):
         if isinstance(hf_model, TextClassificationPipeline):
-            task_features = {"text": "string", "label": "class_label"}
+            task_features = {"text": "string", "label": "label"}
         else:
             msg = "Unsupported model type."
             raise NotImplementedError(msg)
@@ -328,7 +328,7 @@ class HuggingFaceLoader:
 
         for feature in missing_features:
             expected_type = task_features[feature]
-            if expected_type == "class_label":
+            if expected_type == "label":
                 candidates = [
                     f
                     for f in available_features
