@@ -176,7 +176,7 @@ class HuggingFaceLoader:
         try:
             # we do not set the split here
             # because we want to be able to select the best split later with preprocessing
-            hf_dataset = datasets.load_dataset(dataset_id, name=dataset_config, trust_remote_code=True)
+            hf_dataset = datasets.load_dataset(dataset_id, name=dataset_config)
 
             if isinstance(hf_dataset, datasets.Dataset):
                 logger.debug(f"Loaded dataset with {hf_dataset.size_in_bytes} bytes")
