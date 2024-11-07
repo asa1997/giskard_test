@@ -10,7 +10,7 @@ import pandas as pd
 # Prepare vector store (FAISS) with IPPC report
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100, add_start_index=True)
 loader = PyPDFLoader("https://www.ipcc.ch/report/ar6/syr/downloads/report/IPCC_AR6_SYR_LongerReport.pdf")
-db = FAISS.from_documents(loader.load_and_split(text_splitter), OpenAIEmbeddings())
+db = FAISS.from_documents(loader.load_and_split(text_splitter))
 
 # Prepare QA chain
 PROMPT_TEMPLATE = """You are the Climate Assistant, a helpful AI assistant made by Giskard.
@@ -46,7 +46,7 @@ prompt = PromptTemplate(template=PROMPT_TEMPLATE, input_variables=["question", "
 climate_qa_chain = RetrievalQA.from_llm(llm=llm, retriever=db.as_retriever(), prompt=prompt)
 
 # Test that everything works
-climate_qa_chain.invoke({"query": "Is sea level rise avoidable? When will it stop?"})
+climate_qa_chain.invoke({"query": "<s>[INST] Is sea level rise avoidable? When will it stop?[INST]"})
 
 
 
