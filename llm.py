@@ -33,9 +33,9 @@ prompt = PromptTemplate(template=PROMPT_TEMPLATE, input_variables=["context", "q
 
 # Step 4: Initialize Bedrock LLM with correct model ID
 llm = BedrockLLM(
-    model_id="anthropic.claude-v2",  # Ensure this model ID is correct in your Bedrock account
+    model_id="anthropic.claude-3-sonnet-20240229-v1:0",  # Ensure this model ID is correct in your Bedrock account
     model_kwargs={"temperature": 0},
-    client=boto3.client("bedrock-runtime", region_name="us-east-1")
+    client=boto3.client("bedrock-runtime", region_name="ap-south-1")
 )
 
 # Step 5: Create RetrievalQA chain
