@@ -7,6 +7,9 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import boto3
 from abc import ABC, abstractmethod
+from typing import Dict, List, Optional, Sequence
+import os
+import json
 import giskard
 from giskard.llm.client import set_default_client
 from giskard.llm.config import LLMConfigurationError
