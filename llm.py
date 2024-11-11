@@ -33,7 +33,7 @@ prompt = PromptTemplate(template=PROMPT_TEMPLATE, input_variables=["context", "q
 
 # Initialize ChatBedrock with the correct model ID
 llm = ChatBedrock(
-    model_id="anthropic.claude-v3",
+    model_id="anthropic.claude-3-sonnet-20240229-v1:0",
     model_kwargs={"temperature": 0},
     client=boto3.client("bedrock-runtime", region_name="ap-south-1")
 )
