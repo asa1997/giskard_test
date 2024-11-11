@@ -29,7 +29,11 @@ Your answer:
 """
 
 # Step 4: Initialize Claude using Amazon Bedrock
-llm = Bedrock(model="claude-2", model_kwargs={"temperature": 0})
+llm = Bedrock(
+    model_id="claude-2",  # Change 'model' to 'model_id'
+    model_kwargs={"temperature": 0},
+    client=boto3.client("bedrock-runtime")
+)
 prompt = PromptTemplate(template=PROMPT_TEMPLATE, input_variables=["question", "context"])
 climate_qa_chain = RetrievalQA.from_llm(llm=llm, retriever=db.as_retriever(), prompt=prompt)
 
