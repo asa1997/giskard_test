@@ -1,7 +1,7 @@
 from langchain import FAISS, PromptTemplate
-from langchain.llms import Bedrock
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.llms import Bedrock
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.chains import RetrievalQA
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 print(langchain.__version__)
