@@ -1,9 +1,10 @@
-from langchain import Bedrock, FAISS, PromptTemplate
+from langchain import FAISS, PromptTemplate
+from langchain.llms import Bedrock
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.document_loaders import PyPDFLoader
 from langchain.chains import RetrievalQA
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
+print(langchain.__version__)
 # Step 1: Prepare the vector store (FAISS) with the IPCC report
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100, add_start_index=True)
 loader = PyPDFLoader("https://www.ipcc.ch/report/ar6/syr/downloads/report/IPCC_AR6_SYR_LongerReport.pdf")
