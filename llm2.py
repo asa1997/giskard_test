@@ -57,3 +57,30 @@ climate_qa_chain = RetrievalQA.from_llm(llm=llm, retriever=db.as_retriever(), pr
 question = "What are the impacts of climate change on agriculture?"
 response = climate_qa_chain.run(question)
 print(response)
+
+def model_predict(df: pd.DataFrame):
+    """Wraps the LLM call in a simple Python function.
+
+    The function takes a pandas.DataFrame containing the input variables needed
+    by your model, and must return a list of the outputs (one for each row).
+    """
+    return [climate_qa_chain.run({"query": question}) for question in df["question"]]
+
+# Don’t forget to fill the `name` and `description`: they are used by Giskard
+# to generate domain-specific tests.
+giskard_model = giskard.Model(
+    model=model_predict,
+    model_type="text_generation",
+    name="Climate Change Question Answering",
+    description="This model answers any question about climate change based on IPCC reports",
+    feature_names=["question"],
+)
+
+print("###########Running Scan####################")
+scan_results = giskard.scan(giskard_model)
+
+
+display(scan_results)
+
+# Or save it to a file
+scan_results.to_json("scan_results_claude.json")
