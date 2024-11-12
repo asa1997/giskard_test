@@ -161,13 +161,24 @@ llm = ChatBedrock(
 )
 
 # Create the RetrievalQA chain
-climate_qa_chain = RetrievalQA.from_llm(llm=llm, retriever=db.as_retriever(), prompt=prompt)
+# climate_qa_chain = RetrievalQA.from_llm(llm=llm, retriever=db.as_retriever(), prompt=prompt)
 
-# Test the QA chain with a sample question
+# # Test the QA chain with a sample question
+# question = "What are the impacts of climate change on agriculture?"
+# response = climate_qa_chain.run(question)
+# print(response)
+def get_claude_response(prompt: str):
+    response = llm(
+        prompt=prompt,
+        max_tokens=500,  # Adjust as needed
+        temperature=0.7
+    )
+    return response
+
+# Example usage
 question = "What are the impacts of climate change on agriculture?"
-response = climate_qa_chain.run(question)
-print(response)
-
+response = get_claude_response(question)
+print("Claude Response:", response)
 
 
 def model_predict(df: pd.DataFrame):
