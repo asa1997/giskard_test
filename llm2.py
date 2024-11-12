@@ -7,6 +7,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import boto3
+import giskard
+
 from giskard.llm.client.bedrock import ClaudeBedrockClient
 
 import os
