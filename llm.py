@@ -168,12 +168,9 @@ llm = ChatBedrock(
 # response = climate_qa_chain.run(question)
 # print(response)
 def get_claude_response(prompt: str):
-    response = llm(
-        prompt=prompt,
-        max_tokens=500,  # Adjust as needed
-        temperature=0.7
-    )
-    return response
+    messages = [ChatMessage(role="user", content=prompt)]
+    response = llm(messages=messages, max_tokens=500, temperature=0.7)
+    return response.content
 
 # Example usage
 question = "What are the impacts of climate change on agriculture?"
