@@ -1,4 +1,5 @@
 from langchain_aws import ChatBedrock
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
@@ -168,7 +169,10 @@ llm = ChatBedrock(
 # response = climate_qa_chain.run(question)
 # print(response)
 def get_claude_response(prompt: str):
-    messages = [ChatMessage(role="user", content=prompt)]
+    # Use HumanMessage for the user's input
+    messages = [HumanMessage(content=prompt)]
+    
+    # Send the formatted messages to the Claude model
     response = llm(messages=messages, max_tokens=500, temperature=0.7)
     return response.content
 
