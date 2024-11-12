@@ -8,9 +8,9 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import boto3
 import giskard
-
+import pandas as pd
+import json
 from giskard.llm.client.bedrock import ClaudeBedrockClient
-
 import os
 
 bedrock_runtime = boto3.client("bedrock-runtime", region_name=os.environ["AWS_DEFAULT_REGION"])
